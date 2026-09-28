@@ -1,8 +1,36 @@
-<!doctype html><html lang='ko'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>진곱도리탕 운영 인트라넷 V8</title><style>
+<!doctype html><html lang='ko'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>진곱도리탕 운영 인트라넷 V8 Sage Pink</title><style>
 :root{--bg:#f6f4ef;--card:#fff;--ink:#201b18;--muted:#776f68;--accent:#a62b1f;--line:#e7e0d8;--ok:#237a57;--warn:#b85c00}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)}header{background:#241b17;color:white;padding:18px 20px;position:sticky;top:0;z-index:5}.brand{font-weight:900;font-size:20px}.sub{font-size:12px;opacity:.7;margin-top:3px}.wrap{max-width:1180px;margin:auto;padding:18px}.nav{display:flex;gap:8px;overflow:auto;margin-bottom:16px}.nav button{white-space:nowrap;border:1px solid var(--line);background:white;border-radius:999px;padding:10px 14px;font-weight:700}.nav button.on{background:var(--accent);color:white;border-color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 12px #00000008}.metric b{font-size:24px;display:block;margin-top:8px}.muted{color:var(--muted);font-size:13px}.section{display:none}.section.on{display:block}h2{font-size:20px;margin:4px 0 14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button,textarea{font:inherit}input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:10px;background:white}button.primary{border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:white;font-weight:800}button.secondary{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:white;font-weight:700}.mini{padding:6px 9px!important;font-size:12px}.danger{color:#a62b1f}.editrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.editrow input,.editrow select{width:100%}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}th{background:#faf8f5}.low{color:#b3261e;font-weight:800}.ok{color:var(--ok);font-weight:700}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.big{width:100%;max-width:260px}.notice{padding:12px;border-radius:12px;background:#fff6e8;color:#7b4300;margin-bottom:12px}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}table{display:block;overflow-x:auto}.wrap{padding:12px}}@media(max-width:480px){.grid{grid-template-columns:1fr}.metric b{font-size:21px}}
-</style></head><body><header><div class='brand'>진곱도리탕 운영 인트라넷</div><div class='sub'>재고 · 발주 · 매출손익 · 근무표 · 체크리스트</div></header><main class='wrap'><div class='nav' id='nav'></div>
+</style>
+<style id="sage-pink-theme">
+:root{
+  --bg:#F6F5F0 !important;
+  --card:#FFFDFD !important;
+  --text:#2F3932 !important;
+  --muted:#7B817A !important;
+  --line:#DDE3D8 !important;
+  --accent:#D79AA6 !important;
+  --ok:#6F8A70 !important;
+}
+body{background:#F6F5F0 !important;color:#2F3932 !important}
+header{background:#71816B !important;color:#fff !important;border-bottom:5px solid #E9BCC4}
+.nav button{background:#FFFDFD !important;border-color:#DDE3D8 !important;color:#334037 !important}
+.nav button.on{background:#D79AA6 !important;color:#fff !important;border-color:#D79AA6 !important}
+.card{background:#FFFDFD !important;border-color:#DDE3D8 !important}
+button.primary{background:#D79AA6 !important;color:#fff !important}
+button.secondary{background:#F4F7F1 !important;border-color:#DDE3D8 !important;color:#425044 !important}
+input,select,textarea{background:#FFFDFD !important;border-color:#DDE3D8 !important}
+th{background:#EEF3EB !important}
+.notice{background:#FAE9ED !important;color:#75545C !important}
+.low,.danger{color:#C56879 !important}
+.ok{color:#66806A !important}
+
+.inline-edit{width:100%;min-width:76px;padding:7px 8px!important;border-radius:8px!important}
+.inline-edit.num{min-width:82px}
+.save-mini{background:#71816B!important;color:white!important;border-color:#71816B!important}
+</style>
+</head><body><header><div class='brand'>진곱도리탕 운영 인트라넷</div><div class='sub'>재고 · 발주 · 매출손익 · 근무표 · 체크리스트</div></header><main class='wrap'><div class='nav' id='nav'></div>
 <section id='dashboard' class='section on'><h2>대시보드</h2><div class='grid'><div class='card metric'>오늘 매출<b id='dSales'>0원</b><span class='muted'>입력된 오늘 매출</span></div><div class='card metric'>오늘 주문<b id='dOrders'>0건</b><span class='muted'>객단가 자동 계산</span></div><div class='card metric'>부족 재고<b id='dLow'>0개</b><span class='muted'>최소재고 이하</span></div><div class='card metric'>예상 월 손익<b id='dProfit'>0원</b><span class='muted'>손익 설정 기준</span></div></div><div class='two' style='margin-top:12px'><div class='card'><b>오늘 매출 입력</b><div class='row' style='margin-top:10px'><input id='todaySales' type='number' placeholder='매출액'><input id='todayOrders' type='number' placeholder='주문수'><button class='primary' onclick='saveToday()'>저장</button></div><div class='muted' id='aov'></div></div><div class='card'><b>재고 알림</b><div id='lowList' style='margin-top:10px'></div></div></div></section>
-<section id='inventory' class='section'><h2>재고관리</h2><div class='notice'>현재수량이 최소재고 이하가 되면 자동으로 발주대상에 표시됩니다.</div><div class='row'><input id='iName' placeholder='품목명'><input id='iSupplier' placeholder='거래처'><select id='iUnit'><option>kg</option><option>g</option><option>개</option><option>팩</option><option>판</option><option>단</option><option>봉</option><option>박스</option><option>L</option></select><input id='iQty' type='number' step='0.01' placeholder='현재수량'><input id='iMin' type='number' step='0.01' placeholder='최소재고'><input id='iPrice' type='number' placeholder='단가(원)'><input id='iOrderUnit' placeholder='발주단위 (예: BOX)' style='width:130px'><input id='iConv' type='number' step='0.01' placeholder='1발주단위=재고 몇개' style='width:170px'><button class='primary' onclick='addItem()'>품목 추가</button></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재</th><th>최소</th><th>단가</th><th>발주단위</th><th>상태</th><th>입고</th><th></th></tr></thead><tbody id='invBody'></tbody></table></section>
+<section id='inventory' class='section'><h2>재고관리</h2><div class='notice'>현재수량이 최소재고 이하가 되면 자동으로 발주대상에 표시됩니다.</div><div class='row'><input id='iName' placeholder='품목명'><input id='iSupplier' placeholder='거래처'><select id='iUnit'><option>kg</option><option>g</option><option>개</option><option>팩</option><option>판</option><option>단</option><option>봉</option><option>박스</option><option>L</option></select><input id='iQty' type='number' step='0.01' placeholder='현재수량'><input id='iMin' type='number' step='0.01' placeholder='최소재고'><input id='iPrice' type='number' placeholder='단가(원)'><button class='primary' onclick='addItem()'>품목 추가</button></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재</th><th>최소</th><th>단가</th><th>상태</th><th>입고</th><th></th></tr></thead><tbody id='invBody'></tbody></table></section>
 <section id='orders' class='section'><h2>입고·재고조정 내역</h2><table><thead><tr><th>시간</th><th>품목</th><th>구분</th><th>수량</th><th>변경 후</th></tr></thead><tbody id='logBody'></tbody></table></section>
 <section id='closingstock' class='section'><h2>오늘 마감재고</h2><div class='notice'>마감 담당자가 실제 남은 수량만 입력하세요. 저장하면 전 재고 + 오늘 입고 - 마감재고를 기준으로 오늘 사용량을 자동 계산합니다.</div><div class='card'><div class='row'><button class='primary' onclick='saveClosingStock()'>마감재고 한 번에 저장</button><span class='muted' id='closingDate'></span></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재 전산재고</th><th>마감 실재고</th><th>오늘 사용량(예상)</th></tr></thead><tbody id='closingBody'></tbody></table></div><div class='card' style='margin-top:12px'><b>최근 마감 기록</b><div id='closingHistory' style='margin-top:10px'></div></div></section>
 <section id='purchase' class='section'><h2>발주관리</h2><div class='card'><b>발주 필요 품목</b><div id='purchaseList' style='margin-top:12px'></div></div></section>
@@ -31,26 +59,21 @@ if(!data.closingHistory)data.closingHistory=[];
 // V8 품목명/단위 보정
 for(const n of ['떡','감자','비트무']){const x=data.inventory.find(v=>v.name===n);if(x)x.unit='개';}
 let oldP=data.inventory.find(v=>v.name==='편납분모자');if(oldP)oldP.name='팬더분모자';
-// 포장/발주단위 관리 설정
-const packSettings={
- '닭다리살':{supplier:'대신푸드',unit:'봉',orderUnit:'봉',conv:1,note:'1봉=5kg'},
- '닭 안심살':{supplier:'대신푸드',unit:'봉',orderUnit:'봉',conv:1,note:'1봉=5kg'},
- '닭 목살':{supplier:'대신푸드',unit:'봉',orderUnit:'봉',conv:1,note:'1봉=1kg'},
- '뼈닭9호8각':{supplier:'대신푸드',unit:'마리',orderUnit:'마리',conv:1,note:''},
- '양파':{supplier:'푸디스트',unit:'BOX',orderUnit:'BOX',conv:1,note:'1BOX=10kg'},
- '닭도리소스':{supplier:'푸디스트',unit:'개',orderUnit:'BOX',conv:2,note:'1BOX=2개'},
- '간장소스':{supplier:'푸디스트',unit:'개',orderUnit:'BOX',conv:2,note:'1BOX=2개'},
- '카레소스':{supplier:'푸디스트',unit:'개',orderUnit:'BOX',conv:2,note:'1BOX=2개'},
- '마라오일':{supplier:'푸디스트',unit:'개',orderUnit:'BOX',conv:2,note:'1BOX=2개'}
-};
-for(const [n,c] of Object.entries(packSettings)){let x=data.inventory.find(v=>v.name===n);if(!x){x={name:n,supplier:c.supplier,unit:c.unit,qty:0,min:0,price:0};data.inventory.push(x)}Object.assign(x,c)}
-for(const x of data.inventory){if(!x.orderUnit)x.orderUnit=x.unit;if(!x.conv)x.conv=1;if(!('note' in x))x.note='';}
 
 function save(){localStorage.setItem('jingob-v3',JSON.stringify(data));render()}
 $('nav').innerHTML=tabs.map((t,i)=>`<button class='${i?'':'on'}' onclick="show('${t[0]}',this)">${t[1]}</button>`).join('');
 function show(id,b){document.querySelectorAll('.section').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
 function render(){let lows=data.inventory.filter(x=>+x.qty<=+x.min);$('dSales').textContent=money(data.today.sales);$('dOrders').textContent=(data.today.orders||0)+'건';$('dLow').textContent=lows.length+'개';$('aov').textContent=data.today.orders?'객단가 '+money(data.today.sales/data.today.orders):'주문수를 입력하면 객단가가 계산됩니다.';$('lowList').innerHTML=lows.length?lows.map(x=>`<div class='low'>• ${x.name}: ${x.qty}${x.unit} 남음</div>`).join(''):'<span class="ok">부족 재고 없음</span>';
-$('invBody').innerHTML=data.inventory.map((x,i)=>`<tr><td>${x.name}</td><td>${x.supplier||'-'}</td><td>${x.qty}${x.unit}</td><td>${x.min}${x.unit}</td><td>${money(x.price)}</td><td>${x.orderUnit||x.unit}${x.conv!=1?' (1'+(x.orderUnit||x.unit)+'='+x.conv+x.unit+')':''}${x.note?' · '+x.note:''}</td><td class='${x.qty<=x.min?'low':'ok'}'>${x.qty<=x.min?'발주 필요':'정상'}</td><td><button class='secondary' onclick='receiveOrder(${i})'>입고</button></td><td><button class='secondary mini' onclick='editItem(${i})'>수정</button> <button class='secondary mini danger' onclick='delItem(${i})'>삭제</button></td></tr>`).join('');
+$('invBody').innerHTML=data.inventory.map((x,i)=>`<tr>
+<td><input class='inline-edit' id='eName${i}' value="${escAttr(x.name)}"></td>
+<td><input class='inline-edit' id='eSupplier${i}' value="${escAttr(x.supplier||'')}"></td>
+<td><div style='display:flex;gap:5px;align-items:center'><input class='inline-edit num' id='eQty${i}' type='number' step='0.01' value="${x.qty}"><input class='inline-edit' id='eUnit${i}' value="${escAttr(x.unit)}" style='max-width:58px'></div></td>
+<td><input class='inline-edit num' id='eMin${i}' type='number' step='0.01' value="${x.min}"></td>
+<td><input class='inline-edit num' id='ePrice${i}' type='number' step='1' value="${x.price}"></td>
+<td class='${x.qty<=x.min?'low':'ok'}'>${x.qty<=x.min?'발주 필요':'정상'}</td>
+<td><button class='secondary' onclick='adjust(${i},1)'>입고</button></td>
+<td><button class='secondary mini save-mini' onclick='saveInlineItem(${i})'>저장</button> <button class='secondary mini danger' onclick='delItem(${i})'>삭제</button></td>
+</tr>`).join('');
 $('logBody').innerHTML=data.logs.slice().reverse().map(x=>`<tr><td>${x.time}</td><td>${x.name}</td><td>${x.type}</td><td>${x.amount}</td><td>${x.after}</td></tr>`).join('');$('purchaseList').innerHTML=lows.length?lows.map(x=>`<div class='check'><b>${x.name}</b><span>${x.qty}${x.unit} / 최소 ${x.min}${x.unit}</span></div>`).join(''):'<span class="ok">현재 발주 필요 품목이 없습니다.</span>';
 let p=data.profit, margin=1-(p.food+p.app+p.pack)/100, pr=p.sales*margin-p.fixed;$('dProfit').textContent=money(pr);$('pSales').value=p.sales;$('pFood').value=p.food;$('pApp').value=p.app;$('pPack').value=p.pack;$('pFixed').value=p.fixed;$('profitResult').textContent=`예상 잔액 ${money(pr)} · 매출 대비 ${(pr/p.sales*100||0).toFixed(1)}%`;$('profitDetail').innerHTML=`<p>변동비율: <b>${(100-margin*100).toFixed(1)}%</b></p><p>고정비: <b>${money(p.fixed)}</b></p><p>손익분기 매출: <b>${money(p.fixed/margin)}</b></p>`;
 $('staffBody').innerHTML=data.staff.map((x,i)=>`<tr><td>${x.name}</td><td>${x.shift}</td><td>${money(x.wage)}</td><td><button class='secondary mini' onclick='editStaff(${i})'>수정</button> <button class='secondary mini danger' onclick='delStaff(${i})'>삭제</button></td></tr>`).join('');renderClosingStock();renderChecks()}
@@ -74,9 +97,20 @@ function saveClosingStock(){
  localStorage.setItem('jingob-v3',JSON.stringify(data));alert('마감재고가 저장됐습니다. 입력한 품목의 사용량도 자동 계산했어요.');render();
 }
 function saveToday(){data.today={sales:+$('todaySales').value||0,orders:+$('todayOrders').value||0};save()}
-function addItem(){if(!$('iName').value)return;data.inventory.push({name:$('iName').value,supplier:$('iSupplier').value||'',unit:$('iUnit').value,qty:+$('iQty').value||0,min:+$('iMin').value||0,price:+$('iPrice').value||0,orderUnit:$('iOrderUnit').value||$('iUnit').value,conv:+$('iConv').value||1,note:''});['iName','iSupplier','iQty','iMin','iPrice','iOrderUnit','iConv'].forEach(x=>$(x).value='');save()}
-function editItem(i){let x=data.inventory[i];let name=prompt('품목명',x.name);if(name===null)return;let supplier=prompt('거래처',x.supplier||'');if(supplier===null)return;let unit=prompt('재고 단위',x.unit);if(unit===null)return;let orderUnit=prompt('발주 단위',x.orderUnit||x.unit);if(orderUnit===null)return;let conv=prompt('발주단위 1개당 재고단위 수량 (예: 1BOX=2개면 2)',x.conv||1);if(conv===null||isNaN(conv)||+conv<=0)return;let note=prompt('포장 규격 메모 (예: 1봉=5kg)',x.note||'');if(note===null)return;let qty=prompt('현재재고 ('+unit+')',x.qty);if(qty===null||isNaN(qty))return;let min=prompt('최소재고 ('+unit+')',x.min);if(min===null||isNaN(min))return;let price=prompt('매입단가(원)',x.price);if(price===null||isNaN(price))return;Object.assign(x,{name:name.trim()||x.name,supplier:supplier.trim(),unit:unit.trim()||x.unit,orderUnit:orderUnit.trim()||unit,conv:+conv,note:note.trim(),qty:+qty,min:+min,price:+price});save()}
-function receiveOrder(i){let x=data.inventory[i];let ou=x.orderUnit||x.unit, conv=+x.conv||1;let v=prompt(`${x.name} 입고 수량 (${ou})\n${x.note||('1'+ou+' = '+conv+x.unit)}`);if(v===null||isNaN(v)||+v<=0)return;let add=+v*conv;x.qty=+x.qty+add;data.logs.push({time:new Date().toLocaleString('ko-KR'),name:x.name,type:'입고',amount:'+'+v+ou+(conv!==1?' → +'+add+x.unit:''),after:x.qty+x.unit});save()}
+function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function saveInlineItem(i){
+ let x=data.inventory[i];
+ let name=$('eName'+i).value.trim(), supplier=$('eSupplier'+i).value.trim(), unit=$('eUnit'+i).value.trim();
+ let qty=parseFloat($('eQty'+i).value), min=parseFloat($('eMin'+i).value), price=parseFloat($('ePrice'+i).value);
+ if(!name){alert('품목명을 입력해 주세요.');return}
+ if(!unit){alert('단위를 입력해 주세요.');return}
+ if([qty,min,price].some(Number.isNaN)){alert('현재재고·최소재고·단가는 숫자로 입력해 주세요.');return}
+ Object.assign(x,{name,supplier,unit,qty,min,price});
+ save();
+ alert('저장됐어요!');
+}
+function addItem(){if(!$('iName').value)return;data.inventory.push({name:$('iName').value,supplier:$('iSupplier').value||'',unit:$('iUnit').value,qty:+$('iQty').value||0,min:+$('iMin').value||0,price:+$('iPrice').value||0});['iName','iSupplier','iQty','iMin','iPrice'].forEach(x=>$(x).value='');save()}
+function editItem(i){let x=data.inventory[i];let name=prompt('품목명',x.name);if(name===null)return;let supplier=prompt('거래처',x.supplier||'');if(supplier===null)return;let unit=prompt('단위',x.unit);if(unit===null)return;let qty=prompt('현재재고',x.qty);if(qty===null||isNaN(qty))return;let min=prompt('최소재고',x.min);if(min===null||isNaN(min))return;let price=prompt('매입단가(원)',x.price);if(price===null||isNaN(price))return;Object.assign(x,{name:name.trim()||x.name,supplier:supplier.trim(),unit:unit.trim()||x.unit,qty:+qty,min:+min,price:+price});save()}
 function adjust(i,sign){let x=data.inventory[i],v=prompt(`${x.name} ${sign>0?'입고':'사용'} 수량 (${x.unit})`);if(v===null||isNaN(v)||+v<=0)return;x.qty=Math.max(0,+x.qty+sign*+v);data.logs.push({time:new Date().toLocaleString('ko-KR'),name:x.name,type:sign>0?'입고':'사용',amount:(sign>0?'+':'-')+v+x.unit,after:x.qty+x.unit});save()}
 function delItem(i){if(confirm('삭제할까요?')){data.inventory.splice(i,1);save()}}
 function calcProfit(){data.profit={sales:+$('pSales').value||0,food:+$('pFood').value||0,app:+$('pApp').value||0,pack:+$('pPack').value||0,fixed:+$('pFixed').value||0};save()}
