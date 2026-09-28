@@ -28,7 +28,31 @@ th{background:#EEF3EB !important}
 .inline-edit.num{min-width:82px}
 .save-mini{background:#71816B!important;color:white!important;border-color:#71816B!important}
 </style>
-</head><body><header><div class='brand'>진곱도리탕 운영 인트라넷</div><div class='sub'>재고 · 발주 · 매출손익 · 근무표 · 체크리스트</div></header><main class='wrap'><div class='nav' id='nav'></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style id="supabase-ui">
+#loginGate{position:fixed;inset:0;background:linear-gradient(135deg,#71816B,#F0C5CC);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.loginBox{width:min(420px,100%);background:#fffdfd;border-radius:22px;padding:28px;box-shadow:0 18px 55px #0003}
+.loginBox h2{margin:0 0 6px;color:#405044}.loginBox p{color:#7B817A;margin:0 0 18px}
+.loginBox input{width:100%;box-sizing:border-box;margin:6px 0;padding:12px}
+.loginBox button{width:100%;margin-top:8px}
+#loginMsg{margin-top:10px;color:#C56879;font-size:13px}
+.dbbar{position:fixed;right:12px;bottom:12px;z-index:1000;background:#fffdfd;border:1px solid #DDE3D8;border-radius:999px;padding:7px 11px;font-size:12px;box-shadow:0 4px 18px #0001}
+</style>
+</head><body>
+<div id="loginGate">
+ <div class="loginBox">
+  <h2>진곱도리탕 운영 인트라넷</h2>
+  <p>관리자 로그인</p>
+  <input id="loginEmail" type="email" placeholder="이메일">
+  <input id="loginPassword" type="password" placeholder="비밀번호">
+  <button class="primary" onclick="loginSupabase()">로그인</button>
+  <div id="loginMsg"></div>
+ </div>
+</div>
+<div class="dbbar" id="dbStatus">DB 연결 확인 중</div>
+<header><div class='brand'>진곱도리탕 운영 인트라넷</div><div class='sub'>재고 · 발주 · 매출손익 · 근무표 · 체크리스트</div>
+<button onclick="sb.auth.signOut().then(()=>location.reload())" style="float:right;margin-top:-35px;background:#fff3;border:1px solid #fff6;color:white;border-radius:9px;padding:7px 10px">로그아웃</button></header><main class='wrap'><div class='nav' id='nav'></div>
 <section id='dashboard' class='section on'><h2>대시보드</h2><div class='grid'><div class='card metric'>오늘 매출<b id='dSales'>0원</b><span class='muted'>입력된 오늘 매출</span></div><div class='card metric'>오늘 주문<b id='dOrders'>0건</b><span class='muted'>객단가 자동 계산</span></div><div class='card metric'>부족 재고<b id='dLow'>0개</b><span class='muted'>최소재고 이하</span></div><div class='card metric'>예상 월 손익<b id='dProfit'>0원</b><span class='muted'>손익 설정 기준</span></div></div><div class='two' style='margin-top:12px'><div class='card'><b>오늘 매출 입력</b><div class='row' style='margin-top:10px'><input id='todaySales' type='number' placeholder='매출액'><input id='todayOrders' type='number' placeholder='주문수'><button class='primary' onclick='saveToday()'>저장</button></div><div class='muted' id='aov'></div></div><div class='card'><b>재고 알림</b><div id='lowList' style='margin-top:10px'></div></div></div></section>
 <section id='inventory' class='section'><h2>재고관리</h2><div class='notice'>현재수량이 최소재고 이하가 되면 자동으로 발주대상에 표시됩니다.</div><div class='row'><input id='iName' placeholder='품목명'><input id='iSupplier' placeholder='거래처'><select id='iUnit'><option>kg</option><option>g</option><option>개</option><option>팩</option><option>판</option><option>단</option><option>봉</option><option>박스</option><option>L</option></select><input id='iQty' type='number' step='0.01' placeholder='현재수량'><input id='iMin' type='number' step='0.01' placeholder='최소재고'><input id='iPrice' type='number' placeholder='단가(원)'><button class='primary' onclick='addItem()'>품목 추가</button></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재</th><th>최소</th><th>단가</th><th>상태</th><th>입고</th><th></th></tr></thead><tbody id='invBody'></tbody></table></section>
 <section id='orders' class='section'><h2>입고·재고조정 내역</h2><table><thead><tr><th>시간</th><th>품목</th><th>구분</th><th>수량</th><th>변경 후</th></tr></thead><tbody id='logBody'></tbody></table></section>
@@ -38,6 +62,54 @@ th{background:#EEF3EB !important}
 <section id='staff' class='section'><h2>직원·근무표</h2><div class='notice'>직원 이름·근무시간·시급을 웹사이트 안에서 직접 수정할 수 있습니다.</div><div class='row'><input id='sName' placeholder='이름'><input id='sShift' placeholder='예: 수~일 16:00~23:00'><input id='sWage' type='number' placeholder='시급'><button class='primary' onclick='addStaff()'>직원 추가</button></div><table><thead><tr><th>이름</th><th>근무</th><th>시급</th><th>관리</th></tr></thead><tbody id='staffBody'></tbody></table></section>
 <section id='checklist' class='section'><h2>오픈·마감 체크리스트</h2><div class='notice'>항목을 직접 추가·수정·삭제할 수 있습니다. 체크 상태도 자동 저장됩니다.</div><div class='two'><div class='card'><b>오픈</b><div class='row' style='margin-top:10px'><input id='newOpen' placeholder='새 오픈 항목'><button class='primary' onclick="addCheckItem('open')">추가</button></div><div id='openChecks'></div></div><div class='card'><b>마감</b><div class='row' style='margin-top:10px'><input id='newClose' placeholder='새 마감 항목'><button class='primary' onclick="addCheckItem('close')">추가</button></div><div id='closeChecks'></div></div></div><button class='secondary' style='margin-top:12px' onclick='resetChecks()'>오늘 체크 초기화</button></section>
 </main><script>
+const SUPABASE_URL='https://gtxspfkudqhcvvjewjhf.supabase.co';
+const SUPABASE_KEY='sb_publishable_hpAqt5h8tn7UE50RKtjyYw_TYIjnalN';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let dbInventory=[], dbStaff=[], dbChecklist=[];
+async function loginSupabase(){
+ const email=document.getElementById('loginEmail').value.trim();
+ const password=document.getElementById('loginPassword').value;
+ document.getElementById('loginMsg').textContent='로그인 중...';
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ if(error){document.getElementById('loginMsg').textContent='로그인 실패: 이메일/비밀번호를 확인해 주세요.';return}
+ document.getElementById('loginGate').style.display='none';
+ await loadFromDB();
+}
+async function bootSupabase(){
+ const {data:{session}}=await sb.auth.getSession();
+ if(session){document.getElementById('loginGate').style.display='none';await loadFromDB();}
+ else document.getElementById('dbStatus').textContent='로그인 필요';
+}
+async function loadFromDB(){
+ document.getElementById('dbStatus').textContent='DB 불러오는 중';
+ const [a,b,c]=await Promise.all([
+  sb.from('inventory').select('*').order('id'),
+  sb.from('staff_schedule').select('*').order('id'),
+  sb.from('checklist').select('*').eq('active',true).order('sort_order')
+ ]);
+ if(a.error){document.getElementById('dbStatus').textContent='DB 오류';alert(a.error.message);return}
+ dbInventory=a.data||[]; dbStaff=b.data||[]; dbChecklist=c.data||[];
+ data.inventory=dbInventory.map(x=>({id:x.id,name:x.name,supplier:x.supplier||'',qty:+x.stock||0,unit:x.stock_unit||'개',min:+x.minimum_stock||0,price:+x.price||0,orderUnit:x.order_unit||'',unitsPerOrder:+x.units_per_order||1,packageInfo:x.package_info||''}));
+ data.staff=dbStaff.map(x=>({id:x.id,name:x.employee_name||'',shift:[x.day_of_week,x.start_time&&x.end_time?x.start_time+'~'+x.end_time:''].filter(Boolean).join(' '),wage:+x.hourly_wage||0}));
+ data.checkItems.open=dbChecklist.filter(x=>x.checklist_type==='open').map(x=>x.item);
+ data.checkItems.close=dbChecklist.filter(x=>x.checklist_type==='close').map(x=>x.item);
+ document.getElementById('dbStatus').textContent='● Supabase 연결됨';
+ render();
+}
+async function dbSaveInventory(i){
+ const x=data.inventory[i];
+ const payload={name:x.name,supplier:x.supplier||null,stock:+x.qty,stock_unit:x.unit,minimum_stock:+x.min,price:+x.price};
+ const {error}=await sb.from('inventory').update(payload).eq('id',x.id);
+ if(error){alert('DB 저장 실패: '+error.message);return false}
+ return true;
+}
+async function dbDeleteInventory(i){
+ const x=data.inventory[i]; const {error}=await sb.from('inventory').delete().eq('id',x.id);
+ if(error){alert('삭제 실패: '+error.message);return false} await loadFromDB(); return true;
+}
+window.addEventListener('load',bootSupabase);
+</script>
+<script>
 const tabs=[['dashboard','대시보드'],['inventory','재고관리'],['orders','입고내역'],['closingstock','마감재고'],['purchase','발주관리'],['profit','매출·손익'],['staff','직원·근무표'],['checklist','오픈·마감']];
 const $=id=>document.getElementById(id); const money=n=>Math.round(n||0).toLocaleString('ko-KR')+'원';
 const defaultInventory=[
@@ -85,20 +157,20 @@ function renderClosingStock(){
  data.inventory.forEach((x,i)=>{let el=$('closeQty'+i);if(el)el.oninput=()=>{let v=parseFloat(el.value);$('usePreview'+i).textContent=isNaN(v)?'입력 후 계산':Math.max(0,+x.qty-v).toFixed(2).replace(/\.00$/,'')+x.unit;};});
  $('closingHistory').innerHTML=data.closingHistory.length?data.closingHistory.slice(-7).reverse().map(h=>`<div class='check'><span style='flex:1'><b>${h.date}</b> · ${h.count}개 품목 마감</span><span class='muted'>사용량 자동 기록</span></div>`).join(''):'<span class="muted">아직 마감 기록이 없습니다.</span>';
 }
-function saveClosingStock(){
- let entries=[]; let now=new Date();
- data.inventory.forEach((x,i)=>{let el=$('closeQty'+i);if(!el||el.value==='')return;let actual=+el.value;if(isNaN(actual)||actual<0)return;let before=+x.qty;let used=Math.max(0,before-actual);let diff=actual-before;
-   if(used>0)data.logs.push({time:now.toLocaleString('ko-KR'),name:x.name,type:'마감사용량',amount:'-'+used.toFixed(2).replace(/\.00$/,'')+x.unit,after:actual+x.unit});
-   if(diff>0)data.logs.push({time:now.toLocaleString('ko-KR'),name:x.name,type:'재고조정',amount:'+'+diff.toFixed(2).replace(/\.00$/,'')+x.unit,after:actual+x.unit});
-   x.qty=actual; entries.push({name:x.name,before,actual,used,unit:x.unit});
- });
- if(!entries.length){alert('마감 실재고를 하나 이상 입력해주세요.');return;}
- data.closingHistory.push({date:now.toLocaleString('ko-KR'),count:entries.length,entries});
- localStorage.setItem('jingob-v3',JSON.stringify(data));alert('마감재고가 저장됐습니다. 입력한 품목의 사용량도 자동 계산했어요.');render();
+async function saveClosingStock(){
+ const today=new Date().toISOString().slice(0,10);
+ for(let i=0;i<data.inventory.length;i++){
+  let el=$('closeQty'+i); if(!el||el.value==='')continue;
+  let x=data.inventory[i], closing=+el.value, opening=+x.qty, used=Math.max(0,opening-closing);
+  let {error}=await sb.from('closing_stock').insert({inventory_id:x.id,item_name:x.name,closing_date:today,opening_stock:opening,received_quantity:0,closing_quantity:closing,used_quantity:used,unit:x.unit});
+  if(error){alert('마감 저장 실패: '+error.message);return}
+  await sb.from('inventory').update({stock:closing}).eq('id',x.id);
+ }
+ alert('마감재고가 Supabase에 저장됐어요!'); await loadFromDB();
 }
 function saveToday(){data.today={sales:+$('todaySales').value||0,orders:+$('todayOrders').value||0};save()}
 function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function saveInlineItem(i){
+async function saveInlineItem(i){
  let x=data.inventory[i];
  let name=$('eName'+i).value.trim(), supplier=$('eSupplier'+i).value.trim(), unit=$('eUnit'+i).value.trim();
  let qty=parseFloat($('eQty'+i).value), min=parseFloat($('eMin'+i).value), price=parseFloat($('ePrice'+i).value);
@@ -106,17 +178,45 @@ function saveInlineItem(i){
  if(!unit){alert('단위를 입력해 주세요.');return}
  if([qty,min,price].some(Number.isNaN)){alert('현재재고·최소재고·단가는 숫자로 입력해 주세요.');return}
  Object.assign(x,{name,supplier,unit,qty,min,price});
- save();
- alert('저장됐어요!');
+ if(await dbSaveInventory(i)){localStorage.setItem(KEY,JSON.stringify(data));render();alert('Supabase에 저장됐어요!')}
 }
-function addItem(){if(!$('iName').value)return;data.inventory.push({name:$('iName').value,supplier:$('iSupplier').value||'',unit:$('iUnit').value,qty:+$('iQty').value||0,min:+$('iMin').value||0,price:+$('iPrice').value||0});['iName','iSupplier','iQty','iMin','iPrice'].forEach(x=>$(x).value='');save()}
+async function addItem(){
+ if(!$('iName').value)return;
+ const payload={name:$('iName').value,supplier:$('iSupplier').value||null,stock:+$('iQty').value||0,stock_unit:$('iUnit').value,minimum_stock:+$('iMin').value||0,price:+$('iPrice').value||0};
+ const {error}=await sb.from('inventory').insert(payload); if(error){alert('추가 실패: '+error.message);return}
+ ['iName','iSupplier','iQty','iMin','iPrice'].forEach(x=>$(x).value=''); await loadFromDB();
+}
 function editItem(i){let x=data.inventory[i];let name=prompt('품목명',x.name);if(name===null)return;let supplier=prompt('거래처',x.supplier||'');if(supplier===null)return;let unit=prompt('단위',x.unit);if(unit===null)return;let qty=prompt('현재재고',x.qty);if(qty===null||isNaN(qty))return;let min=prompt('최소재고',x.min);if(min===null||isNaN(min))return;let price=prompt('매입단가(원)',x.price);if(price===null||isNaN(price))return;Object.assign(x,{name:name.trim()||x.name,supplier:supplier.trim(),unit:unit.trim()||x.unit,qty:+qty,min:+min,price:+price});save()}
-function adjust(i,sign){let x=data.inventory[i],v=prompt(`${x.name} ${sign>0?'입고':'사용'} 수량 (${x.unit})`);if(v===null||isNaN(v)||+v<=0)return;x.qty=Math.max(0,+x.qty+sign*+v);data.logs.push({time:new Date().toLocaleString('ko-KR'),name:x.name,type:sign>0?'입고':'사용',amount:(sign>0?'+':'-')+v+x.unit,after:x.qty+x.unit});save()}
-function delItem(i){if(confirm('삭제할까요?')){data.inventory.splice(i,1);save()}}
+async function adjust(i,sign){
+ let x=data.inventory[i],v=prompt(`${x.name} ${sign>0?'입고':'사용'} 수량 (${x.unit})`);
+ if(v===null||isNaN(v)||+v<=0)return;
+ const before=+x.qty, after=Math.max(0,before+sign*+v);
+ let {error}=await sb.from('inventory').update({stock:after}).eq('id',x.id);
+ if(error){alert('재고 저장 실패: '+error.message);return}
+ await sb.from('inventory_history').insert({inventory_id:x.id,item_name:x.name,type:sign>0?'입고':'사용',quantity:+v,unit:x.unit,memo:`변경 후 ${after}${x.unit}`});
+ await loadFromDB();
+}
+async function delItem(i){if(confirm('삭제할까요?')) await dbDeleteInventory(i)}
 function calcProfit(){data.profit={sales:+$('pSales').value||0,food:+$('pFood').value||0,app:+$('pApp').value||0,pack:+$('pPack').value||0,fixed:+$('pFixed').value||0};save()}
-function addStaff(){if(!$('sName').value)return;data.staff.push({name:$('sName').value,shift:$('sShift').value,wage:+$('sWage').value||0});$('sName').value=$('sShift').value=$('sWage').value='';save()}
-function editStaff(i){let x=data.staff[i];let name=prompt('직원 이름',x.name);if(name===null)return;let shift=prompt('근무시간/요일',x.shift);if(shift===null)return;let wage=prompt('시급(원)',x.wage);if(wage===null||isNaN(wage))return;Object.assign(x,{name:name.trim()||x.name,shift:shift.trim(),wage:+wage});save()}
-function delStaff(i){if(confirm('직원을 삭제할까요?')){data.staff.splice(i,1);save()}}
+async function addStaff(){
+ if(!$('sName').value)return;
+ const shift=$('sShift').value.trim();
+ const {error}=await sb.from('staff_schedule').insert({employee_name:$('sName').value,day_of_week:shift,hourly_wage:+$('sWage').value||0,memo:''});
+ if(error){alert('직원 저장 실패: '+error.message);return}
+ $('sName').value=$('sShift').value=$('sWage').value=''; await loadFromDB();
+}
+async function editStaff(i){
+ let x=data.staff[i],name=prompt('직원 이름',x.name);if(name===null)return;
+ let shift=prompt('근무시간/요일',x.shift);if(shift===null)return;
+ let wage=prompt('시급(원)',x.wage);if(wage===null||isNaN(wage))return;
+ const {error}=await sb.from('staff_schedule').update({employee_name:name.trim()||x.name,day_of_week:shift.trim(),hourly_wage:+wage}).eq('id',x.id);
+ if(error){alert('직원 수정 실패: '+error.message);return} await loadFromDB();
+}
+async function delStaff(i){
+ if(!confirm('직원을 삭제할까요?'))return;
+ const {error}=await sb.from('staff_schedule').delete().eq('id',data.staff[i].id);
+ if(error){alert('삭제 실패: '+error.message);return} await loadFromDB();
+}
 function renderChecks(){for(const [id,type,key] of [['openChecks','open','o'],['closeChecks','close','c']]){let arr=data.checkItems[type];$(id).innerHTML=arr.map((x,i)=>`<div class='check'><input type='checkbox' ${data.checks[key+i]?'checked':''} onchange="data.checks['${key+i}']=this.checked;save()"><span style='flex:1'>${x}</span><button class='secondary mini' onclick="editCheckItem('${type}',${i})">수정</button><button class='secondary mini danger' onclick="deleteCheckItem('${type}',${i})">삭제</button></div>`).join('')}}
 function addCheckItem(type){let el=$(type==='open'?'newOpen':'newClose'),v=el.value.trim();if(!v)return;data.checkItems[type].push(v);el.value='';save()}
 function editCheckItem(type,i){let v=prompt('체크 항목 수정',data.checkItems[type][i]);if(v===null||!v.trim())return;data.checkItems[type][i]=v.trim();save()}
