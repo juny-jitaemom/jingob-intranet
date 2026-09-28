@@ -1,0 +1,225 @@
+<!doctype html><html lang='ko'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>진곱도리탕 운영 인트라넷 V8 Sage Pink</title><style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#201b18;--muted:#776f68;--accent:#a62b1f;--line:#e7e0d8;--ok:#237a57;--warn:#b85c00}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)}header{background:#241b17;color:white;padding:18px 20px;position:sticky;top:0;z-index:5}.brand{font-weight:900;font-size:20px}.sub{font-size:12px;opacity:.7;margin-top:3px}.wrap{max-width:1180px;margin:auto;padding:18px}.nav{display:flex;gap:8px;overflow:auto;margin-bottom:16px}.nav button{white-space:nowrap;border:1px solid var(--line);background:white;border-radius:999px;padding:10px 14px;font-weight:700}.nav button.on{background:var(--accent);color:white;border-color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 12px #00000008}.metric b{font-size:24px;display:block;margin-top:8px}.muted{color:var(--muted);font-size:13px}.section{display:none}.section.on{display:block}h2{font-size:20px;margin:4px 0 14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button,textarea{font:inherit}input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:10px;background:white}button.primary{border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:white;font-weight:800}button.secondary{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:white;font-weight:700}.mini{padding:6px 9px!important;font-size:12px}.danger{color:#a62b1f}.editrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.editrow input,.editrow select{width:100%}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}th{background:#faf8f5}.low{color:#b3261e;font-weight:800}.ok{color:var(--ok);font-weight:700}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.big{width:100%;max-width:260px}.notice{padding:12px;border-radius:12px;background:#fff6e8;color:#7b4300;margin-bottom:12px}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}table{display:block;overflow-x:auto}.wrap{padding:12px}}@media(max-width:480px){.grid{grid-template-columns:1fr}.metric b{font-size:21px}}
+</style>
+<style id="sage-pink-theme">
+:root{
+  --bg:#F6F5F0 !important;
+  --card:#FFFDFD !important;
+  --text:#2F3932 !important;
+  --muted:#7B817A !important;
+  --line:#DDE3D8 !important;
+  --accent:#D79AA6 !important;
+  --ok:#6F8A70 !important;
+}
+body{background:#F6F5F0 !important;color:#2F3932 !important}
+header{background:#71816B !important;color:#fff !important;border-bottom:5px solid #E9BCC4}
+.nav button{background:#FFFDFD !important;border-color:#DDE3D8 !important;color:#334037 !important}
+.nav button.on{background:#D79AA6 !important;color:#fff !important;border-color:#D79AA6 !important}
+.card{background:#FFFDFD !important;border-color:#DDE3D8 !important}
+button.primary{background:#D79AA6 !important;color:#fff !important}
+button.secondary{background:#F4F7F1 !important;border-color:#DDE3D8 !important;color:#425044 !important}
+input,select,textarea{background:#FFFDFD !important;border-color:#DDE3D8 !important}
+th{background:#EEF3EB !important}
+.notice{background:#FAE9ED !important;color:#75545C !important}
+.low,.danger{color:#C56879 !important}
+.ok{color:#66806A !important}
+
+.inline-edit{width:100%;min-width:76px;padding:7px 8px!important;border-radius:8px!important}
+.inline-edit.num{min-width:82px}
+.save-mini{background:#71816B!important;color:white!important;border-color:#71816B!important}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style id="supabase-ui">
+#loginGate{position:fixed;inset:0;background:linear-gradient(135deg,#71816B,#F0C5CC);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.loginBox{width:min(420px,100%);background:#fffdfd;border-radius:22px;padding:28px;box-shadow:0 18px 55px #0003}
+.loginBox h2{margin:0 0 6px;color:#405044}.loginBox p{color:#7B817A;margin:0 0 18px}
+.loginBox input{width:100%;box-sizing:border-box;margin:6px 0;padding:12px}
+.loginBox button{width:100%;margin-top:8px}
+#loginMsg{margin-top:10px;color:#C56879;font-size:13px}
+.dbbar{position:fixed;right:12px;bottom:12px;z-index:1000;background:#fffdfd;border:1px solid #DDE3D8;border-radius:999px;padding:7px 11px;font-size:12px;box-shadow:0 4px 18px #0001}
+</style>
+</head><body>
+<div id="loginGate">
+ <div class="loginBox">
+  <h2>진곱도리탕 운영 인트라넷</h2>
+  <p>관리자 로그인</p>
+  <input id="loginEmail" type="email" placeholder="이메일">
+  <input id="loginPassword" type="password" placeholder="비밀번호">
+  <button class="primary" onclick="loginSupabase()">로그인</button>
+  <div id="loginMsg"></div>
+ </div>
+</div>
+<div class="dbbar" id="dbStatus">DB 연결 확인 중</div>
+<header><div class='brand'>진곱도리탕 운영 인트라넷</div><div class='sub'>재고 · 발주 · 매출손익 · 근무표 · 체크리스트</div>
+<button onclick="sb.auth.signOut().then(()=>location.reload())" style="float:right;margin-top:-35px;background:#fff3;border:1px solid #fff6;color:white;border-radius:9px;padding:7px 10px">로그아웃</button></header><main class='wrap'><div class='nav' id='nav'></div>
+<section id='dashboard' class='section on'><h2>대시보드</h2><div class='grid'><div class='card metric'>오늘 매출<b id='dSales'>0원</b><span class='muted'>입력된 오늘 매출</span></div><div class='card metric'>오늘 주문<b id='dOrders'>0건</b><span class='muted'>객단가 자동 계산</span></div><div class='card metric'>부족 재고<b id='dLow'>0개</b><span class='muted'>최소재고 이하</span></div><div class='card metric'>예상 월 손익<b id='dProfit'>0원</b><span class='muted'>손익 설정 기준</span></div></div><div class='two' style='margin-top:12px'><div class='card'><b>오늘 매출 입력</b><div class='row' style='margin-top:10px'><input id='todaySales' type='number' placeholder='매출액'><input id='todayOrders' type='number' placeholder='주문수'><button class='primary' onclick='saveToday()'>저장</button></div><div class='muted' id='aov'></div></div><div class='card'><b>재고 알림</b><div id='lowList' style='margin-top:10px'></div></div></div></section>
+<section id='inventory' class='section'><h2>재고관리</h2><div class='notice'>현재수량이 최소재고 이하가 되면 자동으로 발주대상에 표시됩니다.</div><div class='row'><input id='iName' placeholder='품목명'><input id='iSupplier' placeholder='거래처'><select id='iUnit'><option>kg</option><option>g</option><option>개</option><option>팩</option><option>판</option><option>단</option><option>봉</option><option>박스</option><option>L</option></select><input id='iQty' type='number' step='0.01' placeholder='현재수량'><input id='iMin' type='number' step='0.01' placeholder='최소재고'><input id='iPrice' type='number' placeholder='단가(원)'><button class='primary' onclick='addItem()'>품목 추가</button></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재</th><th>최소</th><th>단가</th><th>상태</th><th>입고</th><th></th></tr></thead><tbody id='invBody'></tbody></table></section>
+<section id='orders' class='section'><h2>입고·재고조정 내역</h2><table><thead><tr><th>시간</th><th>품목</th><th>구분</th><th>수량</th><th>변경 후</th></tr></thead><tbody id='logBody'></tbody></table></section>
+<section id='closingstock' class='section'><h2>오늘 마감재고</h2><div class='notice'>마감 담당자가 실제 남은 수량만 입력하세요. 저장하면 전 재고 + 오늘 입고 - 마감재고를 기준으로 오늘 사용량을 자동 계산합니다.</div><div class='card'><div class='row'><button class='primary' onclick='saveClosingStock()'>마감재고 한 번에 저장</button><span class='muted' id='closingDate'></span></div><table><thead><tr><th>품목</th><th>거래처</th><th>현재 전산재고</th><th>마감 실재고</th><th>오늘 사용량(예상)</th></tr></thead><tbody id='closingBody'></tbody></table></div><div class='card' style='margin-top:12px'><b>최근 마감 기록</b><div id='closingHistory' style='margin-top:10px'></div></div></section>
+<section id='purchase' class='section'><h2>발주관리</h2><div class='card'><b>발주 필요 품목</b><div id='purchaseList' style='margin-top:12px'></div></div></section>
+<section id='profit' class='section'><h2>매출·손익관리</h2><div class='two'><div class='card'><b>월 손익 계산</b><div class='row' style='margin-top:12px'><input id='pSales' type='number' placeholder='월 매출'><input id='pFood' type='number' value='33' placeholder='재료원가 %'><input id='pApp' type='number' value='31' placeholder='앱/배달 %'><input id='pPack' type='number' value='2' placeholder='포장 %'><input id='pFixed' type='number' value='6915000' placeholder='월 고정비'></div><button class='primary' onclick='calcProfit()'>계산 및 저장</button><div id='profitResult' style='margin-top:16px;font-size:18px;font-weight:800'></div></div><div class='card'><b>비용 기준</b><p class='muted'>기본값은 이전 계획값입니다. 실제 정산내역을 확인하면 수수료·배달비·할인 부담을 직접 수정하세요.</p><div id='profitDetail'></div></div></div></section>
+<section id='staff' class='section'><h2>직원·근무표</h2><div class='notice'>직원 이름·근무시간·시급을 웹사이트 안에서 직접 수정할 수 있습니다.</div><div class='row'><input id='sName' placeholder='이름'><input id='sShift' placeholder='예: 수~일 16:00~23:00'><input id='sWage' type='number' placeholder='시급'><button class='primary' onclick='addStaff()'>직원 추가</button></div><table><thead><tr><th>이름</th><th>근무</th><th>시급</th><th>관리</th></tr></thead><tbody id='staffBody'></tbody></table></section>
+<section id='checklist' class='section'><h2>오픈·마감 체크리스트</h2><div class='notice'>항목을 직접 추가·수정·삭제할 수 있습니다. 체크 상태도 자동 저장됩니다.</div><div class='two'><div class='card'><b>오픈</b><div class='row' style='margin-top:10px'><input id='newOpen' placeholder='새 오픈 항목'><button class='primary' onclick="addCheckItem('open')">추가</button></div><div id='openChecks'></div></div><div class='card'><b>마감</b><div class='row' style='margin-top:10px'><input id='newClose' placeholder='새 마감 항목'><button class='primary' onclick="addCheckItem('close')">추가</button></div><div id='closeChecks'></div></div></div><button class='secondary' style='margin-top:12px' onclick='resetChecks()'>오늘 체크 초기화</button></section>
+</main><script>
+const SUPABASE_URL='https://gtxspfkudqhcvvjewjhf.supabase.co';
+const SUPABASE_KEY='sb_publishable_hpAqt5h8tn7UE50RKtjyYw_TYIjnalN';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let dbInventory=[], dbStaff=[], dbChecklist=[];
+async function loginSupabase(){
+ const email=document.getElementById('loginEmail').value.trim();
+ const password=document.getElementById('loginPassword').value;
+ document.getElementById('loginMsg').textContent='로그인 중...';
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ if(error){document.getElementById('loginMsg').textContent='로그인 실패: 이메일/비밀번호를 확인해 주세요.';return}
+ document.getElementById('loginGate').style.display='none';
+ await loadFromDB();
+}
+async function bootSupabase(){
+ const {data:{session}}=await sb.auth.getSession();
+ if(session){document.getElementById('loginGate').style.display='none';await loadFromDB();}
+ else document.getElementById('dbStatus').textContent='로그인 필요';
+}
+async function loadFromDB(){
+ document.getElementById('dbStatus').textContent='DB 불러오는 중';
+ const [a,b,c]=await Promise.all([
+  sb.from('inventory').select('*').order('id'),
+  sb.from('staff_schedule').select('*').order('id'),
+  sb.from('checklist').select('*').eq('active',true).order('sort_order')
+ ]);
+ if(a.error){document.getElementById('dbStatus').textContent='DB 오류';alert(a.error.message);return}
+ dbInventory=a.data||[]; dbStaff=b.data||[]; dbChecklist=c.data||[];
+ data.inventory=dbInventory.map(x=>({id:x.id,name:x.name,supplier:x.supplier||'',qty:+x.stock||0,unit:x.stock_unit||'개',min:+x.minimum_stock||0,price:+x.price||0,orderUnit:x.order_unit||'',unitsPerOrder:+x.units_per_order||1,packageInfo:x.package_info||''}));
+ data.staff=dbStaff.map(x=>({id:x.id,name:x.employee_name||'',shift:[x.day_of_week,x.start_time&&x.end_time?x.start_time+'~'+x.end_time:''].filter(Boolean).join(' '),wage:+x.hourly_wage||0}));
+ data.checkItems.open=dbChecklist.filter(x=>x.checklist_type==='open').map(x=>x.item);
+ data.checkItems.close=dbChecklist.filter(x=>x.checklist_type==='close').map(x=>x.item);
+ document.getElementById('dbStatus').textContent='● Supabase 연결됨';
+ render();
+}
+async function dbSaveInventory(i){
+ const x=data.inventory[i];
+ const payload={name:x.name,supplier:x.supplier||null,stock:+x.qty,stock_unit:x.unit,minimum_stock:+x.min,price:+x.price};
+ const {error}=await sb.from('inventory').update(payload).eq('id',x.id);
+ if(error){alert('DB 저장 실패: '+error.message);return false}
+ return true;
+}
+async function dbDeleteInventory(i){
+ const x=data.inventory[i]; const {error}=await sb.from('inventory').delete().eq('id',x.id);
+ if(error){alert('삭제 실패: '+error.message);return false} await loadFromDB(); return true;
+}
+window.addEventListener('load',bootSupabase);
+</script>
+<script>
+const tabs=[['dashboard','대시보드'],['inventory','재고관리'],['orders','입고내역'],['closingstock','마감재고'],['purchase','발주관리'],['profit','매출·손익'],['staff','직원·근무표'],['checklist','오픈·마감']];
+const $=id=>document.getElementById(id); const money=n=>Math.round(n||0).toLocaleString('ko-KR')+'원';
+const defaultInventory=[
+{name:'마늘후레이크',supplier:'네이버',unit:'봉',qty:0,min:0,price:0},{name:'쭈꾸미',supplier:'네이버',unit:'kg',qty:0,min:0,price:0},{name:'다진김치',supplier:'네이버',unit:'kg',qty:0,min:0,price:0},{name:'메추리알',supplier:'네이버',unit:'팩',qty:0,min:0,price:0},{name:'볶음참깨',supplier:'네이버',unit:'봉',qty:0,min:0,price:0},{name:'감자만두',supplier:'네이버',unit:'봉',qty:0,min:0,price:0},{name:'오뚜기 1회용 와사비',supplier:'네이버',unit:'박스',qty:0,min:0,price:0},{name:'고형카레',supplier:'네이버',unit:'개',qty:0,min:0,price:0},{name:'수제비',supplier:'네이버',unit:'봉',qty:0,min:0,price:0},
+{name:'파김치',supplier:'쿠팡',unit:'kg',qty:0,min:0,price:0},{name:'깐계란',supplier:'쿠팡',unit:'판',qty:0,min:0,price:0},{name:'순두부',supplier:'쿠팡',unit:'개',qty:0,min:0,price:0},{name:'캡사이신',supplier:'쿠팡',unit:'개',qty:0,min:0,price:0},{name:'분모자',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},{name:'뉴진면',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},{name:'김',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},{name:'연근분모자(꽃)',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},{name:'넓적분모자',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},{name:'팬더분모자',supplier:'쿠팡',unit:'봉',qty:0,min:0,price:0},
+{name:'쌀',supplier:'식봄',unit:'kg',qty:0,min:0,price:0},{name:'계란',supplier:'식봄',unit:'판',qty:0,min:0,price:0},{name:'한우대창',supplier:'바위골축산',unit:'kg',qty:0,min:0,price:19500},
+{name:'닭도리소스',supplier:'푸디스트',unit:'팩',qty:0,min:0,price:0},{name:'간장소스',supplier:'푸디스트',unit:'팩',qty:0,min:0,price:0},{name:'카레소스',supplier:'푸디스트',unit:'팩',qty:0,min:0,price:0},{name:'마라오일',supplier:'푸디스트',unit:'병',qty:0,min:0,price:0},{name:'새우볶음밥',supplier:'푸디스트',unit:'봉',qty:0,min:0,price:0},{name:'계란볶음밥',supplier:'푸디스트',unit:'봉',qty:0,min:0,price:0},{name:'조미액',supplier:'푸디스트',unit:'개',qty:0,min:0,price:0},{name:'감자',supplier:'푸디스트',unit:'개',qty:0,min:0,price:0},{name:'묵은지',supplier:'푸디스트',unit:'kg',qty:0,min:0,price:0},{name:'우동',supplier:'푸디스트',unit:'봉',qty:0,min:0,price:0},{name:'당면',supplier:'푸디스트',unit:'봉',qty:0,min:0,price:0},{name:'떡',supplier:'푸디스트',unit:'개',qty:0,min:0,price:0},{name:'비트무',supplier:'푸디스트',unit:'개',qty:0,min:0,price:0},{name:'마라소스',supplier:'푸디스트',unit:'팩',qty:0,min:0,price:0},
+{name:'차돌박이',supplier:'미트박스',unit:'kg',qty:0,min:0,price:0},{name:'양파',supplier:'푸디스트',unit:'kg',qty:0,min:0,price:0},{name:'부추',supplier:'푸디스트',unit:'단',qty:0,min:0,price:0},{name:'대파',supplier:'푸디스트',unit:'단',qty:0,min:0,price:0},
+{name:'닭 안심살',supplier:'대신푸드',unit:'kg',qty:0,min:0,price:0},{name:'닭다리살',supplier:'대신푸드',unit:'kg',qty:0,min:0,price:0},{name:'닭 목살',supplier:'대신푸드',unit:'kg',qty:0,min:0,price:0}
+];
+let data=JSON.parse(localStorage.getItem('jingob-v3')||'null')||{inventory:defaultInventory.map(x=>({...x})),logs:[],today:{sales:0,orders:0},profit:{sales:23000000,food:33,app:31,pack:2,fixed:6915000},staff:[{name:'김영숙',shift:'수~일 16:00~23:00',wage:13000},{name:'김소중',shift:'금~일 10:00~16:00',wage:13000}],checks:{},checkItems:{open:['가스·전기·환기 확인','냉장·냉동 온도 확인','주요 재고 확인','포장재 수량 확인','조리/포장대 위생 확인'],close:['남은 재고 확인','부족품목 발주 확인','가스·전기 확인','설거지 및 작업대 청소','바닥·쓰레기·음식물 정리']}};
+data.inventory=data.inventory.filter(x=>x && typeof x.name==='string' && x.name.trim()!=='');
+for(const item of defaultInventory){if(!data.inventory.some(x=>x.name===item.name))data.inventory.push({...item});}
+// V6 데이터 보정
+for(const n of ['닭 안심살','닭다리살','닭 목살']){const x=data.inventory.find(v=>v.name===n);if(x)x.supplier='대신푸드';}
+let egg=data.inventory.find(v=>v.name==='계란');if(!egg)data.inventory.push({name:'계란',supplier:'식봄',unit:'판',qty:0,min:0,price:0});else egg.supplier='식봄';
+if(!data.checkItems)data.checkItems={open:['가스·전기·환기 확인','냉장·냉동 온도 확인','주요 재고 확인','포장재 수량 확인','조리/포장대 위생 확인'],close:['남은 재고 확인','부족품목 발주 확인','가스·전기 확인','설거지 및 작업대 청소','바닥·쓰레기·음식물 정리']};
+if(!data.closingHistory)data.closingHistory=[];
+// V8 품목명/단위 보정
+for(const n of ['떡','감자','비트무']){const x=data.inventory.find(v=>v.name===n);if(x)x.unit='개';}
+let oldP=data.inventory.find(v=>v.name==='편납분모자');if(oldP)oldP.name='팬더분모자';
+
+function save(){localStorage.setItem('jingob-v3',JSON.stringify(data));render()}
+$('nav').innerHTML=tabs.map((t,i)=>`<button class='${i?'':'on'}' onclick="show('${t[0]}',this)">${t[1]}</button>`).join('');
+function show(id,b){document.querySelectorAll('.section').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+function render(){let lows=data.inventory.filter(x=>+x.qty<=+x.min);$('dSales').textContent=money(data.today.sales);$('dOrders').textContent=(data.today.orders||0)+'건';$('dLow').textContent=lows.length+'개';$('aov').textContent=data.today.orders?'객단가 '+money(data.today.sales/data.today.orders):'주문수를 입력하면 객단가가 계산됩니다.';$('lowList').innerHTML=lows.length?lows.map(x=>`<div class='low'>• ${x.name}: ${x.qty}${x.unit} 남음</div>`).join(''):'<span class="ok">부족 재고 없음</span>';
+$('invBody').innerHTML=data.inventory.map((x,i)=>`<tr>
+<td><input class='inline-edit' id='eName${i}' value="${escAttr(x.name)}"></td>
+<td><input class='inline-edit' id='eSupplier${i}' value="${escAttr(x.supplier||'')}"></td>
+<td><div style='display:flex;gap:5px;align-items:center'><input class='inline-edit num' id='eQty${i}' type='number' step='0.01' value="${x.qty}"><input class='inline-edit' id='eUnit${i}' value="${escAttr(x.unit)}" style='max-width:58px'></div></td>
+<td><input class='inline-edit num' id='eMin${i}' type='number' step='0.01' value="${x.min}"></td>
+<td><input class='inline-edit num' id='ePrice${i}' type='number' step='1' value="${x.price}"></td>
+<td class='${x.qty<=x.min?'low':'ok'}'>${x.qty<=x.min?'발주 필요':'정상'}</td>
+<td><button class='secondary' onclick='adjust(${i},1)'>입고</button></td>
+<td><button class='secondary mini save-mini' onclick='saveInlineItem(${i})'>저장</button> <button class='secondary mini danger' onclick='delItem(${i})'>삭제</button></td>
+</tr>`).join('');
+$('logBody').innerHTML=data.logs.slice().reverse().map(x=>`<tr><td>${x.time}</td><td>${x.name}</td><td>${x.type}</td><td>${x.amount}</td><td>${x.after}</td></tr>`).join('');$('purchaseList').innerHTML=lows.length?lows.map(x=>`<div class='check'><b>${x.name}</b><span>${x.qty}${x.unit} / 최소 ${x.min}${x.unit}</span></div>`).join(''):'<span class="ok">현재 발주 필요 품목이 없습니다.</span>';
+let p=data.profit, margin=1-(p.food+p.app+p.pack)/100, pr=p.sales*margin-p.fixed;$('dProfit').textContent=money(pr);$('pSales').value=p.sales;$('pFood').value=p.food;$('pApp').value=p.app;$('pPack').value=p.pack;$('pFixed').value=p.fixed;$('profitResult').textContent=`예상 잔액 ${money(pr)} · 매출 대비 ${(pr/p.sales*100||0).toFixed(1)}%`;$('profitDetail').innerHTML=`<p>변동비율: <b>${(100-margin*100).toFixed(1)}%</b></p><p>고정비: <b>${money(p.fixed)}</b></p><p>손익분기 매출: <b>${money(p.fixed/margin)}</b></p>`;
+$('staffBody').innerHTML=data.staff.map((x,i)=>`<tr><td>${x.name}</td><td>${x.shift}</td><td>${money(x.wage)}</td><td><button class='secondary mini' onclick='editStaff(${i})'>수정</button> <button class='secondary mini danger' onclick='delStaff(${i})'>삭제</button></td></tr>`).join('');renderClosingStock();renderChecks()}
+
+function renderClosingStock(){
+ if(!$('closingBody'))return;
+ $('closingDate').textContent='입력일: '+new Date().toLocaleDateString('ko-KR');
+ $('closingBody').innerHTML=data.inventory.map((x,i)=>`<tr><td><b>${x.name}</b></td><td>${x.supplier||'-'}</td><td>${x.qty}${x.unit}</td><td><input id='closeQty${i}' type='number' min='0' step='0.01' placeholder='남은 수량' style='width:120px'> <span class='muted'>${x.unit}</span></td><td id='usePreview${i}' class='muted'>입력 후 계산</td></tr>`).join('');
+ data.inventory.forEach((x,i)=>{let el=$('closeQty'+i);if(el)el.oninput=()=>{let v=parseFloat(el.value);$('usePreview'+i).textContent=isNaN(v)?'입력 후 계산':Math.max(0,+x.qty-v).toFixed(2).replace(/\.00$/,'')+x.unit;};});
+ $('closingHistory').innerHTML=data.closingHistory.length?data.closingHistory.slice(-7).reverse().map(h=>`<div class='check'><span style='flex:1'><b>${h.date}</b> · ${h.count}개 품목 마감</span><span class='muted'>사용량 자동 기록</span></div>`).join(''):'<span class="muted">아직 마감 기록이 없습니다.</span>';
+}
+async function saveClosingStock(){
+ const today=new Date().toISOString().slice(0,10);
+ for(let i=0;i<data.inventory.length;i++){
+  let el=$('closeQty'+i); if(!el||el.value==='')continue;
+  let x=data.inventory[i], closing=+el.value, opening=+x.qty, used=Math.max(0,opening-closing);
+  let {error}=await sb.from('closing_stock').insert({inventory_id:x.id,item_name:x.name,closing_date:today,opening_stock:opening,received_quantity:0,closing_quantity:closing,used_quantity:used,unit:x.unit});
+  if(error){alert('마감 저장 실패: '+error.message);return}
+  await sb.from('inventory').update({stock:closing}).eq('id',x.id);
+ }
+ alert('마감재고가 Supabase에 저장됐어요!'); await loadFromDB();
+}
+function saveToday(){data.today={sales:+$('todaySales').value||0,orders:+$('todayOrders').value||0};save()}
+function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+async function saveInlineItem(i){
+ let x=data.inventory[i];
+ let name=$('eName'+i).value.trim(), supplier=$('eSupplier'+i).value.trim(), unit=$('eUnit'+i).value.trim();
+ let qty=parseFloat($('eQty'+i).value), min=parseFloat($('eMin'+i).value), price=parseFloat($('ePrice'+i).value);
+ if(!name){alert('품목명을 입력해 주세요.');return}
+ if(!unit){alert('단위를 입력해 주세요.');return}
+ if([qty,min,price].some(Number.isNaN)){alert('현재재고·최소재고·단가는 숫자로 입력해 주세요.');return}
+ Object.assign(x,{name,supplier,unit,qty,min,price});
+ if(await dbSaveInventory(i)){localStorage.setItem(KEY,JSON.stringify(data));render();alert('Supabase에 저장됐어요!')}
+}
+async function addItem(){
+ if(!$('iName').value)return;
+ const payload={name:$('iName').value,supplier:$('iSupplier').value||null,stock:+$('iQty').value||0,stock_unit:$('iUnit').value,minimum_stock:+$('iMin').value||0,price:+$('iPrice').value||0};
+ const {error}=await sb.from('inventory').insert(payload); if(error){alert('추가 실패: '+error.message);return}
+ ['iName','iSupplier','iQty','iMin','iPrice'].forEach(x=>$(x).value=''); await loadFromDB();
+}
+function editItem(i){let x=data.inventory[i];let name=prompt('품목명',x.name);if(name===null)return;let supplier=prompt('거래처',x.supplier||'');if(supplier===null)return;let unit=prompt('단위',x.unit);if(unit===null)return;let qty=prompt('현재재고',x.qty);if(qty===null||isNaN(qty))return;let min=prompt('최소재고',x.min);if(min===null||isNaN(min))return;let price=prompt('매입단가(원)',x.price);if(price===null||isNaN(price))return;Object.assign(x,{name:name.trim()||x.name,supplier:supplier.trim(),unit:unit.trim()||x.unit,qty:+qty,min:+min,price:+price});save()}
+async function adjust(i,sign){
+ let x=data.inventory[i],v=prompt(`${x.name} ${sign>0?'입고':'사용'} 수량 (${x.unit})`);
+ if(v===null||isNaN(v)||+v<=0)return;
+ const before=+x.qty, after=Math.max(0,before+sign*+v);
+ let {error}=await sb.from('inventory').update({stock:after}).eq('id',x.id);
+ if(error){alert('재고 저장 실패: '+error.message);return}
+ await sb.from('inventory_history').insert({inventory_id:x.id,item_name:x.name,type:sign>0?'입고':'사용',quantity:+v,unit:x.unit,memo:`변경 후 ${after}${x.unit}`});
+ await loadFromDB();
+}
+async function delItem(i){if(confirm('삭제할까요?')) await dbDeleteInventory(i)}
+function calcProfit(){data.profit={sales:+$('pSales').value||0,food:+$('pFood').value||0,app:+$('pApp').value||0,pack:+$('pPack').value||0,fixed:+$('pFixed').value||0};save()}
+async function addStaff(){
+ if(!$('sName').value)return;
+ const shift=$('sShift').value.trim();
+ const {error}=await sb.from('staff_schedule').insert({employee_name:$('sName').value,day_of_week:shift,hourly_wage:+$('sWage').value||0,memo:''});
+ if(error){alert('직원 저장 실패: '+error.message);return}
+ $('sName').value=$('sShift').value=$('sWage').value=''; await loadFromDB();
+}
+async function editStaff(i){
+ let x=data.staff[i],name=prompt('직원 이름',x.name);if(name===null)return;
+ let shift=prompt('근무시간/요일',x.shift);if(shift===null)return;
+ let wage=prompt('시급(원)',x.wage);if(wage===null||isNaN(wage))return;
+ const {error}=await sb.from('staff_schedule').update({employee_name:name.trim()||x.name,day_of_week:shift.trim(),hourly_wage:+wage}).eq('id',x.id);
+ if(error){alert('직원 수정 실패: '+error.message);return} await loadFromDB();
+}
+async function delStaff(i){
+ if(!confirm('직원을 삭제할까요?'))return;
+ const {error}=await sb.from('staff_schedule').delete().eq('id',data.staff[i].id);
+ if(error){alert('삭제 실패: '+error.message);return} await loadFromDB();
+}
+function renderChecks(){for(const [id,type,key] of [['openChecks','open','o'],['closeChecks','close','c']]){let arr=data.checkItems[type];$(id).innerHTML=arr.map((x,i)=>`<div class='check'><input type='checkbox' ${data.checks[key+i]?'checked':''} onchange="data.checks['${key+i}']=this.checked;save()"><span style='flex:1'>${x}</span><button class='secondary mini' onclick="editCheckItem('${type}',${i})">수정</button><button class='secondary mini danger' onclick="deleteCheckItem('${type}',${i})">삭제</button></div>`).join('')}}
+function addCheckItem(type){let el=$(type==='open'?'newOpen':'newClose'),v=el.value.trim();if(!v)return;data.checkItems[type].push(v);el.value='';save()}
+function editCheckItem(type,i){let v=prompt('체크 항목 수정',data.checkItems[type][i]);if(v===null||!v.trim())return;data.checkItems[type][i]=v.trim();save()}
+function deleteCheckItem(type,i){if(confirm('이 체크 항목을 삭제할까요?')){data.checkItems[type].splice(i,1);data.checks={};save()}}
+function resetChecks(){data.checks={};save()}render();
+</script></body></html>
